@@ -1,0 +1,10 @@
+{
+  "name": "voice-purchase-form",
+  "version": "1.0.0",
+  "private": true,
+  "description": "فرم «لیست خرید» قطعات الکترونیکی به صورت وب‌اپ، با پر کردن خانه‌ها از طریق گفتار فارسی",
+  "scripts": {
+    "start": "node serve.js",
+    "test": "node --test"
+  }
+}

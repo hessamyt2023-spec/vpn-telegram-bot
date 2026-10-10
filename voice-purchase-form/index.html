@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>لیست خرید صوتی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1 class="brand-name">لیست خرید صوتی</h1>
+      <p class="brand-sub">فرم خرید قطعه، با گفتار فارسی پر می‌شود</p>
+    </div>
+    <div class="forms">
+      <label for="form-select" class="sr-only">فرم باز</label>
+      <select id="form-select"></select>
+      <button type="button" class="btn" id="btn-new-form">فرم جدید</button>
+      <button type="button" class="btn btn-quiet" id="btn-delete-form">حذف فرم</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="sheet-col" aria-label="فرم">
+      <div class="toolbar">
+        <div class="tool-group">
+          <button type="button" class="btn btn-quiet" id="btn-undo" title="برگرداندن (Ctrl+Z)">برگرداندن</button>
+          <button type="button" class="btn btn-quiet" id="btn-redo" title="انجام دوباره (Ctrl+Y)">انجام دوباره</button>
+        </div>
+        <div class="tool-group">
+          <button type="button" class="btn btn-quiet" id="btn-csv">خروجی اکسل (CSV)</button>
+          <button type="button" class="btn btn-quiet" id="btn-json">خروجی JSON</button>
+          <button type="button" class="btn btn-quiet" id="btn-import">ورود JSON</button>
+          <button type="button" class="btn btn-quiet" id="btn-print">چاپ</button>
+          <button type="button" class="btn btn-quiet btn-danger" id="btn-clear">پاک کردن ردیف‌ها</button>
+        </div>
+      </div>
+
+      <div class="sheet" id="sheet">
+        <table class="form-table">
+          <colgroup>
+            <col class="w-idx"><col class="w-kala"><col class="w-type"><col class="w-qty"><col class="w-desc"><col class="w-act">
+          </colgroup>
+          <thead>
+            <tr class="title-row">
+              <th colspan="2" class="t-title">
+                <label for="form-title" class="sr-only">عنوان فرم</label>
+                <input id="form-title" class="title-input" autocomplete="off">
+              </th>
+              <th colspan="4" class="t-date">
+                <label for="form-date">تاریخ</label>
+                <input id="form-date" class="date-input" inputmode="numeric" placeholder="1405/07/06" autocomplete="off" dir="ltr">
+                <button type="button" class="chip" id="btn-today">امروز</button>
+              </th>
+            </tr>
+            <tr class="head-row">
+              <th scope="col">ردیف</th>
+              <th scope="col">کالا</th>
+              <th scope="col">نوع</th>
+              <th scope="col">تعداد</th>
+              <th scope="col">توضیحات</th>
+              <th scope="col" class="c-act"><span class="sr-only">حذف</span></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <button type="button" class="add-row" id="btn-add-row">+ افزودن ردیف</button>
+      </div>
+      <p class="summary" id="summary"></p>
+    </section>
+
+    <aside class="console" aria-label="ورود صوتی">
+      <div class="mic-strip">
+        <button type="button" class="mic" id="mic" aria-pressed="false" aria-describedby="mic-status">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+            <path d="M6 11a6 6 0 0 0 12 0M12 17v4M8.5 21h7"></path>
+          </svg>
+          <span class="sr-only" id="mic-label">روشن کردن میکروفون</span>
+        </button>
+        <div class="mic-meta">
+          <p class="mic-status" id="mic-status">برای شروع روی میکروفون بزنید</p>
+          <p class="transcript" id="transcript" aria-live="polite"><span class="t-final" id="t-final"></span> <span class="t-interim" id="t-interim"></span></p>
+          <p class="last-result" id="last-result" hidden></p>
+        </div>
+      </div>
+
+      <div class="voice-settings">
+      <div class="controls">
+        <div class="seg" role="group" aria-label="حالت پر کردن">
+          <button type="button" data-mode="smart" aria-pressed="true">فرمان آزاد</button>
+          <button type="button" data-mode="guided" aria-pressed="false">خانه به خانه</button>
+        </div>
+        <div class="seg" role="group" aria-label="زبان گفتار">
+          <button type="button" data-lang="fa-IR" aria-pressed="true">فارسی</button>
+          <button type="button" data-lang="en-US" aria-pressed="false" lang="en">English</button>
+        </div>
+      </div>
+      <label class="check" for="opt-units"><input type="checkbox" id="opt-units" checked> تبدیل واحدها <span class="mono">(صد نانو → 100NF)</span></label>
+      <p class="mode-hint" id="mode-hint"></p>
+      <p class="notice" id="env-notice" hidden></p>
+      </div>
+
+      <form class="cmd" id="cmd-form" autocomplete="off">
+        <label for="cmd-input">فرمان متنی</label>
+        <div class="cmd-row">
+          <input id="cmd-input" placeholder="مثلا: ردیف سه تعداد چهار">
+          <button type="submit" class="btn btn-primary">اجرا</button>
+        </div>
+        <p class="hint">همان فرمان‌های صوتی؛ میکروفون کیبورد گوشی هم اینجا کار می‌کند.</p>
+      </form>
+
+      <section class="log-wrap" aria-labelledby="log-title">
+        <h2 id="log-title">آخرین تغییرات</h2>
+        <ol class="log" id="log" aria-live="polite"></ol>
+      </section>
+
+      <details class="help" id="help">
+        <summary>نمونهٔ فرمان‌ها (روی هرکدام بزنید تا اجرا شود)</summary>
+        <ul class="examples" id="examples"></ul>
+        <p class="hint">در حالت «خانه به خانه» فقط مقدار خانهٔ نارنجی را بگویید. «بعدی» رد می‌شود، «قبلی» برمی‌گردد و «تمام» میکروفون را خاموش می‌کند.</p>
+      </details>
+    </aside>
+  </main>
+
+  <div class="print-sheet" id="print-sheet" aria-hidden="true"></div>
+</div>
+
+<input type="file" id="file-import" accept=".json,application/json" hidden>
+<script src="parser.js"></script>
+<script src="voice.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
