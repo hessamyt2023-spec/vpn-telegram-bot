@@ -202,13 +202,10 @@
     examples: $('examples'),
     help: $('help'),
     printSheet: $('print-sheet'),
-    fileImport: $('file-import'),
     undo: $('btn-undo'),
     redo: $('btn-redo'),
     print: $('btn-print'),
     csv: $('btn-csv'),
-    json: $('btn-json'),
-    importBtn: $('btn-import'),
   };
 
   function rowIndex(id) {
@@ -604,13 +601,9 @@
     el.notice.textContent = 'در پیش‌نمایش claude.ai مرورگر اجازهٔ میکروفون نمی‌دهد. برای گفتار زنده نسخهٔ میزبانی‌شده را در Chrome یا Edge باز کنید؛ اینجا می‌توانید فرمان‌ها را تایپ کنید، روی نمونه‌ها بزنید، یا با میکروفون کیبورد گوشی در کادر «فرمان متنی» صحبت کنید.';
     el.print.hidden = true;
     el.csv.hidden = true;
-    el.json.hidden = true;
     window.claude.use('downloads').then((dl) => {
       downloads = dl;
-      if (dl) {
-        el.csv.hidden = false;
-        el.json.hidden = false;
-      }
+      if (dl) el.csv.hidden = false;
     }).catch(() => {});
   }
 
@@ -634,15 +627,6 @@
     f.rows.filter((r) => FIELDS.some((k) => String(r[k]).trim()))
       .forEach((r, i) => lines.push([i + 1, r.kala, r.type, r.qty, r.desc]));
     return '﻿' + lines.map((l) => l.map(csvCell).join(',')).join('\r\n');
-  }
-
-  function toJSON() {
-    const f = current();
-    return JSON.stringify({
-      app: 'voice-purchase-form',
-      version: 1,
-      form: { title: f.title, date: f.date, rows: f.rows.map(({ kala, type, qty, desc }) => ({ kala, type, qty, desc })) },
-    }, null, 2);
   }
 
   async function saveFile(filename, text, mime) {
@@ -669,27 +653,6 @@
     renderLog();
   }
 
-  function importJSON(text) {
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      throw new Error('فایل JSON معتبر نیست.');
-    }
-    const src = data && data.form ? data.form : data;
-    const rows = Array.isArray(src) ? src : src && src.rows;
-    if (!Array.isArray(rows)) throw new Error('در این فایل ردیفی پیدا نشد.');
-    const form = makeForm({
-      title: (src && src.title) || 'لیست خرید',
-      date: (src && src.date) || P.todayJalali(),
-      rows: rows.map((r) => (Array.isArray(r)
-        ? { kala: r[0], type: r[1], qty: r[2], desc: r[3] }
-        : { kala: r.kala, type: r.type, qty: r.qty, desc: r.desc })),
-    });
-    state.forms.push(form);
-    state.currentId = form.id;
-    return form;
-  }
 
   // ---------------------------------------------------------------------------
   // Events
@@ -863,26 +826,9 @@
   });
 
   el.csv.addEventListener('click', () => saveFile(fileBase() + '.csv', toCSV(), 'text/csv;charset=utf-8'));
-  el.json.addEventListener('click', () => saveFile(fileBase() + '.json', toJSON(), 'application/json'));
   el.print.addEventListener('click', () => {
     renderPrint();
     window.print();
-  });
-  el.importBtn.addEventListener('click', () => el.fileImport.click());
-  el.fileImport.addEventListener('change', () => {
-    const file = el.fileImport.files && el.fileImport.files[0];
-    if (!file) return;
-    file.text().then((text) => {
-      try {
-        const form = importJSON(text);
-        addLog('ok', `فرم وارد شد (${fa(form.rows.length)} ردیف)`, null, file.name);
-      } catch (err) {
-        addLog('error', err.message, null, file.name);
-      }
-      el.fileImport.value = '';
-      persist();
-      render();
-    });
   });
 
   document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {

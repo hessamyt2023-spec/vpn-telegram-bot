@@ -73,7 +73,6 @@ npm start          # یا: node serve.js
 - همه‌چیز خودکار در همین مرورگر (localStorage) ذخیره می‌شود. چند فرم می‌توانید
   داشته باشید و از فهرست بالای صفحه بینشان جابه‌جا شوید.
 - **خروجی اکسل (CSV)** با UTF-8 که اکسل فارسی را درست باز می‌کند.
-- **خروجی/ورود JSON** برای پشتیبان‌گیری یا انتقال به دستگاه دیگر.
 - **چاپ** همان جدول فرم کاغذی را روی A4 چاپ می‌کند (یا با «Save as PDF» فایل PDF بسازید).
 
 ## فایل‌ها
@@ -92,5 +91,5 @@ npm start          # یا: node serve.js
 form (row, item, package type, quantity, notes, Jalali date) and fills it from Persian speech
 via the browser Web Speech API (`fa-IR`; Chrome/Edge). `parser.js` turns utterances into
 add/update/delete/select/date commands, converts Persian number words and electronics units
-(`صد نانو` → `100NF`), and has a cell-by-cell mode. Data autosaves to localStorage; CSV/JSON
-export, JSON import and an A4 print layout are included. Run with `npm start`, test with `npm test`.
+(`صد نانو` → `100NF`), and has a cell-by-cell mode. Data autosaves to localStorage; CSV
+export and an A4 print layout are included. Run with `npm start`, test with `npm test`.
