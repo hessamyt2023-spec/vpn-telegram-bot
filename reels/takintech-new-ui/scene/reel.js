@@ -205,7 +205,7 @@
   const hl1 = words(SC.hook.lines[0], hookWrap, { fontSize: '84px', fontWeight: 500, color: 'var(--muted)' });
   const h2row = el('div', 'line', hookWrap);
   const h2 = el('div', '', h2row);
-  css(h2, { position: 'relative', display: 'inline-block', fontSize: '236px', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-4px' });
+  css(h2, { position: 'relative', display: 'inline-block', fontSize: '236px', fontWeight: 900, lineHeight: 1.15 });
   const h2main = el('span', 'grad', h2);
   h2main.textContent = SC.hook.lines[1];
   css(h2main, { filter: 'drop-shadow(0 0 40px rgba(61,123,255,.55))' });
@@ -764,7 +764,14 @@
 
   // ---------------------------------------------------------------- ready
   const fontLoads = [400, 500, 700, 800, 900].map(w => document.fonts.load(`${w} 100px Vaz`, 'تکین abc'));
+  function fitBrand() {
+    S.hook.style.display = 'block';
+    const w = h2.offsetWidth;
+    if (w > 960) h2.style.fontSize = Math.floor(236 * 960 / w) + 'px';
+    S.hook.style.display = 'none';
+  }
   window.__ready = Promise.all(fontLoads)
+    .then(() => fitBrand())
     .then(() => setupLogo())
     .then(() => document.fonts.ready)
     .then(() => { window.__seek(0); return true; });

@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn, execSync } = require('child_process');
+const { pathToFileURL } = require('url');
 
 function loadPlaywright() {
   try { return require('playwright'); } catch (e) { /* fall through to global install */ }
@@ -54,7 +55,7 @@ function collectAssets() {
   page.on('pageerror', e => console.error('[page error]', e.message));
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   await page.addInitScript(([c, a]) => { window.__CONFIG = c; window.__ASSETS = a; }, [cfg, assets]);
-  await page.goto('file://' + path.join(ROOT, 'scene', 'index.html'));
+  await page.goto(pathToFileURL(path.join(ROOT, 'scene', 'index.html')).href);
   await page.evaluate(() => window.__ready);
 
   const cues = await page.evaluate(() => window.__CUES);
